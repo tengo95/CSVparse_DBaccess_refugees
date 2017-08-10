@@ -1,7 +1,6 @@
 package org.codingnomads.refugees.controller;
 
 import org.codingnomads.refugees.model.RefugeeByYearCountry;
-import org.codingnomads.refugees.model.SQLPojo;
 import org.codingnomads.refugees.model.WorldBankIndicators;
 
 import java.sql.*;
@@ -10,7 +9,7 @@ import java.util.ArrayList;
 /**
  * Created by tanerali on 18/07/2017.
  */
-public class ConvertToDB {
+public class DBAccess {
 
     private Connection connection = null;
     private Statement statement = null;
@@ -22,11 +21,14 @@ public class ConvertToDB {
 
         try{
             System.out.println("creating connection");
+
             // This will load the MySQL driver, each DB has its own driver
             Class.forName("com.mysql.jdbc.Driver");
+
             // Setup the connection with the DB
-            connection = DriverManager.getConnection("jdbc:mysql://localhost/worldbank?" +
-                    "user=root&password=<password>&useSSL=false");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost/?" +
+                    "user=root&password=***REMOVED***&useSSL=false");
+
             System.out.println("connection succeeded");
 
         } catch (ClassNotFoundException cnf){
@@ -47,7 +49,7 @@ public class ConvertToDB {
             System.out.println("Preapring statement...");
             // PreparedStatements can use variables and are more efficient
             preparedStatement = connection
-                    .prepareStatement("insert into refugees_all " +
+                    .prepareStatement("insert into immigrants.refugees_all " +
                             "(year, country, origin, refugees, asylum_seekers, " +
                             "returned_refugees, internally_displaced_persons, " +
                             "returned_internally_displaced_persons, stateless_persons, " +
@@ -82,10 +84,6 @@ public class ConvertToDB {
     }
 
 
-
-
-
-
     public boolean writeToDBWorldBankIndicators(ArrayList<WorldBankIndicators> indicators) {
 
         try {
@@ -95,7 +93,7 @@ public class ConvertToDB {
             System.out.println("Preapring statement...");
             // PreparedStatements can use variables and are more efficient
             preparedStatement = connection
-                    .prepareStatement("insert into worldbank_indicators " +
+                    .prepareStatement("insert into worldbank.worldbank_indicators " +
                             "(seriesName, seriesCode, countryName, countryCode, " +
                             "YR2000, YR2001, YR2002, YR2003, YR2004, YR2005, YR2006, YR2007, YR2008, " +
                             "YR2009, YR2010, YR2011, YR2012, YR2013, YR2014, YR2015) " +
@@ -144,51 +142,37 @@ public class ConvertToDB {
     }
 
 
+    public ResultSet readAdataBase (String query) {
 
-    //takes the results from a query and puts them in an ArrayList of SQLPojos
-    public ArrayList<SQLPojo> writeResultSet(ResultSet resultSet) throws SQLException {
-
-        ArrayList<SQLPojo> queryPojos = new ArrayList<>();
-
-        // loop through the result set to get each next line
-        while (resultSet.next()) {
-
-            //assign the values from the corresponding columns to variables
-            int year = resultSet.getInt("year");
-            int totalRefugees = resultSet.getInt("population");
-
-            //instantiate an object of SQLPojo
-            SQLPojo pojo = new SQLPojo();
-
-            //write the values from the variables to the pojo
-            pojo.setYear(year);
-            pojo.setTotalRefugees(totalRefugees);
-
-            queryPojos.add(pojo);
-
-        }
-        return queryPojos;
-    }
-
-    public ArrayList<SQLPojo> readAdataBase (String query) {
-
-        ArrayList<SQLPojo> resultPojos = null;
         try {
+            ResultSetMetaData rsmd = null;
+
             connection = getConnection();
 
             // Statements allow to issue SQL queries to the database
             statement = connection.createStatement();
             //
             resultSet = statement.executeQuery(query);
-
             //
-            resultPojos = writeResultSet(resultSet);
+            rsmd = resultSet.getMetaData();
+            int columnsNumber = rsmd.getColumnCount();
+
+
+            while (resultSet.next() ) {
+
+                for (int i = 1; i <= columnsNumber; i++) {
+                    if (i > 1) System.out.print(",  ");
+                    String columnValue = resultSet.getString(i);
+                    System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                }
+                System.out.println("");
+            }
 
         } catch (Exception e) {
             e.getMessage();
         }
 
-        return resultPojos;
+        return resultSet;
     }
 
 

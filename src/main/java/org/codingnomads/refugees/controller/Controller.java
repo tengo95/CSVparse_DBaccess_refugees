@@ -1,14 +1,9 @@
 package org.codingnomads.refugees.controller;
 
 import org.codingnomads.refugees.model.RefugeeByYearCountry;
-import org.codingnomads.refugees.model.SQLPojo;
 import org.codingnomads.refugees.model.WorldBankIndicators;
 
-import org.codingnomads.refugees.controller.ParseCSVRefugeeByYearCountry;
-import org.codingnomads.refugees.controller.ParseCSVWorldBankIndicators;
-
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -27,62 +22,59 @@ public class Controller {
 
         String[] str = {"Australia"};
 
-        boolean populate = false;
+        boolean populate = true;
 
-        if (populate) {
-            System.out.println("Starting app...");
-            ArrayList<RefugeeByYearCountry> refugees = parseFile();
-            System.out.println("Parsing complplete...");
-            System.out.println("Calling ConvertToDB() ");
-            ConvertToDB db = new ConvertToDB();
-            boolean success = db.writeToDBRefugeeByYearCountry(refugees);
+        DBAccess db = new DBAccess();
 
-            System.out.println("Starting app...");
-            ArrayList<WorldBankIndicators> indicators = ParseCSVWorldBankIndicators.parseFile();
-            System.out.println("Parsing complplete...");
-            System.out.println("Calling ConvertToDB() ");
-            ConvertToDB db2 = new ConvertToDB();
-            boolean success2 = db2.writeToDBWorldBankIndicators(indicators);
+//        if (populate) {
+//            System.out.println("Starting app...");
+//            ArrayList<RefugeeByYearCountry> refugees = parseFile();
+//            System.out.println("Parsing complplete...");
+//            System.out.println("Calling DBAccess() ");
+//            boolean success = db.writeToDBRefugeeByYearCountry(refugees);
+//
+//            System.out.println("Starting app...");
+//            ArrayList<WorldBankIndicators> indicators = ParseCSVWorldBankIndicators.parseFile();
+//            System.out.println("Parsing complplete...");
+//            System.out.println("Calling DBAccess() ");
+//            boolean success2 = db.writeToDBWorldBankIndicators(indicators);
+//
+//        } else {
+//            System.out.println("Which query do you want yo?");
+//        }
 
-        } else {
 
-            ConvertToDB db = new ConvertToDB();
+        for (;;) {
+            System.out.println("Which query do you want yo?\n1, 2 or 3\nexit to terminate");
 
-            ArrayList<SQLPojo> resultPojos = null;
-
-            System.out.println("Which query do you want yo?");
             switch (input.nextInt()) {
                 case 1:
-                    resultPojos = db.readAdataBase(getQuery() );
+                    System.out.println("worldbank or refugees yall");
+                    resultSet = db.readAdataBase(getQuery(input.next()) );
                     break;
                 case 2:
-                    resultPojos = db.readAdataBase(getQuery2(str[0]));
+                    resultSet = db.readAdataBase(getQuery2(str[0]));
                     break;
                 case 3:
-                    resultPojos = db.readAdataBase(getQuery3(str[0]) );
-
+                    resultSet = db.readAdataBase(getQuery3(str[0]) );
+                    System.out.println("Year Refugees");
             }
-
-
-            System.out.println("Number of result-pojos "+ resultPojos.size());
-
-            System.out.println("Year Refugees");
-
-            for (int i = 0; i < resultPojos.size(); i++) {
-                System.out.print(resultPojos.get(i).getYear() + " ");
-                System.out.println(resultPojos.get(i).getTotalRefugees() );
-            }
-
-
-
+            if (input.nextLine() == "exit" )
+                break;
         }
 
     }
 
 
-    public static String getQuery () {
+    public static String getQuery (String s) {
         System.out.println("Executing query 1...");
-        return "select * from worldbank.worldbank_indicators;";
+
+        if (s.equalsIgnoreCase("worldbank") ) {
+            return "select * from worldbank.worldbank_indicators;";
+        } else if (s.equalsIgnoreCase("refugees") ) {
+            return "select * from immigrants.refugees_all;";
+        }
+        return "worldbank or refugees yall";
     }
 
     public static String getQuery2 (String s) {
