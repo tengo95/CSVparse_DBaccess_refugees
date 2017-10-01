@@ -1,7 +1,13 @@
 package org.codingnomads.refugees.controller;
 
+import org.codingnomads.refugees.model.RefugeeByYearCountry;
+import org.codingnomads.refugees.model.WorldBankIndicators;
+
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Scanner;
+
+import static org.codingnomads.refugees.controller.ParseCSVRefugeeByYearCountry.parseFile;
 
 /**
  * Created by tanerali on 19/07/2017.
