@@ -1,13 +1,7 @@
 package org.codingnomads.refugees.controller;
 
-import org.codingnomads.refugees.model.RefugeeByYearCountry;
-import org.codingnomads.refugees.model.WorldBankIndicators;
-
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.Scanner;
-
-import static org.codingnomads.refugees.controller.ParseCSVRefugeeByYearCountry.parseFile;
 
 /**
  * Created by tanerali on 19/07/2017.
@@ -22,26 +16,26 @@ public class Controller {
 
         String[] str = {"Australia"};
 
-        boolean populate = true;
+        boolean populate = false;
 
         DBAccess db = new DBAccess();
 
-//        if (populate) {
-//            System.out.println("Starting app...");
-//            ArrayList<RefugeeByYearCountry> refugees = parseFile();
-//            System.out.println("Parsing complplete...");
-//            System.out.println("Calling DBAccess() ");
-//            boolean success = db.writeToDBRefugeeByYearCountry(refugees);
-//
-//            System.out.println("Starting app...");
-//            ArrayList<WorldBankIndicators> indicators = ParseCSVWorldBankIndicators.parseFile();
-//            System.out.println("Parsing complplete...");
-//            System.out.println("Calling DBAccess() ");
-//            boolean success2 = db.writeToDBWorldBankIndicators(indicators);
-//
-//        } else {
-//            System.out.println("Which query do you want yo?");
-//        }
+        if (populate) {
+            System.out.println("Starting app...");
+            ArrayList<RefugeeByYearCountry> refugees = parseFile();
+            System.out.println("Parsing complplete...");
+            System.out.println("Calling DBAccess() ");
+            boolean success = db.writeToDBRefugeeByYearCountry(refugees);
+
+            System.out.println("Starting app...");
+            ArrayList<WorldBankIndicators> indicators = ParseCSVWorldBankIndicators.parseFile();
+            System.out.println("Parsing complplete...");
+            System.out.println("Calling DBAccess() ");
+            boolean success2 = db.writeToDBWorldBankIndicators(indicators);
+
+        } else {
+            System.out.println("Which query do you want yo?");
+        }
 
 
         for (;;) {

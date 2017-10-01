@@ -17,6 +17,7 @@ public class DBAccess {
     private ResultSet resultSet = null;
 
 
+    //method for creating a connection to DB
     public Connection getConnection() {
 
         try{
@@ -27,7 +28,7 @@ public class DBAccess {
 
             // Setup the connection with the DB
             connection = DriverManager.getConnection("jdbc:mysql://localhost/?" +
-                    "user=root&password=***REMOVED***&useSSL=false");
+                    "user=root&password=CodingNomadsFoEva!&useSSL=false");
 
             System.out.println("connection succeeded");
 
@@ -57,8 +58,8 @@ public class DBAccess {
                             "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             for (int i = 0; i< refugees.size(); i++) {
+
                 // Parameters start with 1
-                //preparedStatement.setInt(1, refugees.get(i).getId() );
                 preparedStatement.setInt(1, refugees.get(i).getYear() );
                 preparedStatement.setString(2, refugees.get(i).getCountryOfResidence() );
                 preparedStatement.setString(3, refugees.get(i).getOrigin() );
@@ -71,19 +72,31 @@ public class DBAccess {
                 preparedStatement.setDouble(10, refugees.get(i).getOthersOfConcern() );
                 preparedStatement.setDouble(11, refugees.get(i).getTotalPopulation() );
 
-                preparedStatement.executeUpdate();
-                System.out.println("record £"+ i+ " inserted in refugees_all table");
+                //add preparedStatement to batch so they can be inserted together as a
+                //batch instead of hitting the DB each time for a single insert
+                preparedStatement.addBatch();
+
+                //this is to avoid out of memory exceptions which can happen if
+                //too many insert statements are put in a batch before executing the batch;
+                //this makes sure that every 1000 insert statements get executed as a batch
+                if(i % 1000 == 0) {
+                    preparedStatement.executeBatch();
+                }
             }
 
-        } catch (Exception e) {
+            //this executes any remaining insert statements in the last batch
+            preparedStatement.executeBatch();
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        System.out.println("All done. You rock. Check your db for all the data.");
+        System.out.println("All done. Check your db for all the data.");
         return true;
     }
 
 
+    //same comments as above
     public boolean writeToDBWorldBankIndicators(ArrayList<WorldBankIndicators> indicators) {
 
         try {
@@ -123,13 +136,14 @@ public class DBAccess {
                 preparedStatement.setDouble(19, indicators.get(i).getYR2014() );
                 preparedStatement.setDouble(20, indicators.get(i).getYR2015() );
 
-                preparedStatement.executeUpdate();
-                System.out.println("record £"+ i+ " inserted in worldbank_indicators");
+                preparedStatement.addBatch();
 
-                if (i==243) {
-                    System.out.println("here");
+                if (i % 1000 == 0) {
+                    preparedStatement.executeBatch();
                 }
             }
+
+            preparedStatement.executeBatch();
 
         } catch (SQLException exc) {
             System.out.println(exc);
@@ -137,7 +151,7 @@ public class DBAccess {
             e.printStackTrace();
         }
 
-        System.out.println("All done. You rock. Check your db for all the data.");
+        System.out.println("All done. Check your db for all the data.");
         return true;
     }
 
@@ -145,27 +159,41 @@ public class DBAccess {
     public ResultSet readAdataBase (String query) {
 
         try {
-            ResultSetMetaData rsmd = null;
 
             connection = getConnection();
 
             // Statements allow to issue SQL queries to the database
             statement = connection.createStatement();
-            //
+
+            //ResultSet receives the results from the query
             resultSet = statement.executeQuery(query);
-            //
+
+            //this gets the metadata from the resultSset, in this case,
+            //the number of columns
+            ResultSetMetaData rsmd;
             rsmd = resultSet.getMetaData();
-            int columnsNumber = rsmd.getColumnCount();
+            int numColumns = rsmd.getColumnCount();
 
+            //print out column names
+            for (int i = 1; i <= numColumns; i++) {
 
+                if (i > 1) System.out.print("   ");
+                System.out.print(rsmd.getColumnName(i));
+            }
+            System.out.println();
+
+            //moves forward one row from current position; goes through each
+            //row in the resultSet
             while (resultSet.next() ) {
 
-                for (int i = 1; i <= columnsNumber; i++) {
+                //print out value in each field
+                for (int i = 1; i <= numColumns; i++) {
+
                     if (i > 1) System.out.print(",  ");
                     String columnValue = resultSet.getString(i);
-                    System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                    System.out.print(columnValue);
                 }
-                System.out.println("");
+                System.out.println();
             }
 
         } catch (Exception e) {

@@ -1,7 +1,7 @@
 package org.codingnomads.refugees.controller;
 
 /**
- * This class is designed to parse the refugees_all_years.csv file form the UN. Thia file can be found
+ * This class is designed to parse the refugees_all_years.csv file from the UN. This file can be found
  * here: https://data.world/nrippner/refugee-host-nations
  */
 import org.codingnomads.refugees.model.RefugeeByYearCountry;
@@ -15,10 +15,10 @@ public class ParseCSVRefugeeByYearCountry {
 
 
     public static ArrayList<RefugeeByYearCountry> parseFile () {
+
         System.out.println("parseFile() called...");
 
-
-        //create arraylist to hold RefugeesByYearCountry objects that are created in while loop below
+        //create arraylist to hold RefugeeByYearCountry objects that are created in while loop below
         ArrayList<RefugeeByYearCountry> refugees = new ArrayList();
 
 
@@ -32,13 +32,15 @@ public class ParseCSVRefugeeByYearCountry {
 
 
         //use try-with-resources
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile)) ) {
+
             //discard first line of file which is headers/column names
             line = br.readLine();
 
             //this while loop assigns the next line of the csv file to the variable
             //"line" and while it is not null it continues looping
             while ( (line = br.readLine()) != null) {
+
                 //create empty pojo of RefugeeByYearCountry to populate
                 //from csv file - each line in file is a new object
                 RefugeeByYearCountry ref = new RefugeeByYearCountry();
@@ -47,7 +49,7 @@ public class ParseCSVRefugeeByYearCountry {
                 //the results will automatically be stored in an array called data
                 String[] data = line.split(",");
 
-                //begin setting RefugeeByYearCountry (ref) instance vars
+                //begin setting (RefugeeByYearCountry) ref object's fields
                 //using the data read from the csv file, which is now in the data array
                 ref.setId(Integer.parseInt(data[0]) );
                 ref.setYear(Integer.parseInt(data[1]) );
@@ -84,7 +86,8 @@ public class ParseCSVRefugeeByYearCountry {
 
                 //loop through until all lines of csv file have been processed
             }
-            //catch IOException
+
+        //catch IOException
         } catch (IOException e) {
             e.printStackTrace();
         }

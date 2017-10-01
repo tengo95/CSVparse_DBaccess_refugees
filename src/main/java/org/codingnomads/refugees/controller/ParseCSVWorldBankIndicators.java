@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 
 /**
- * This class is designed to parse the refugees_all_years.csv file form the UN. Thia file can be found
+ * This class is designed to parse the worldbank_indiactors.csv file from the UN. This file can be found
  * here: https://data.world/nrippner/refugee-host-nations
  */
 
@@ -37,20 +37,23 @@ public class ParseCSVWorldBankIndicators {
 
         //use try-with-resources
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+
             //discard first line of file which is headers/column names
             line = br.readLine();
 
             //this while loop assigns the next line of the csv file to the variable
             //"line" and while it is not null it continues looping
             while ( (line = br.readLine()) != null) {
-                //create empty pojo of WorldBankIndicators to populate
-                //from csv file - each line in file is a new object
+
+                //create empty WorldBankIndicators object to populate with data
+                //from current row in csv file - each line in file is a new object
                 WorldBankIndicators ind = new WorldBankIndicators();
 
                 //use the "split" method to split the line on each comma
                 //the results will automatically be stored in an array called data
 
 //                if (line.contains("") )
+
                 String[] data = line.split(",(?=([^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)");
                 ArrayList<String> data2 = customSplitSpecific(line);
 
@@ -112,11 +115,9 @@ public class ParseCSVWorldBankIndicators {
                 indicators.add(ind);
 
                 //loop through until all lines of csv file have been processed
-
-                System.out.println(count);
-                count++;
             }
-            //catch IOException
+
+        //catch IOException
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -124,8 +125,8 @@ public class ParseCSVWorldBankIndicators {
     }
 
 
-    //used for splitting the String values in columns 1-4 series
-    //seriesName, seriesCode, countryName, countryCode
+    //used for splitting the String values in columns 1-4: seriesName
+    //seriesCode, countryName, countryCode
     public static ArrayList<String> customSplitSpecific(String s)
     {
         ArrayList<String> words = new ArrayList<String>();

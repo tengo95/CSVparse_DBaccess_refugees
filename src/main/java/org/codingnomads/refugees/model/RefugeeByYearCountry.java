@@ -21,7 +21,10 @@ public class RefugeeByYearCountry {
 
 
 
-    public RefugeeByYearCountry(int id, int year, String countryOfResidence, String origin, double refugees, double asylumSeekers, double returnedRefugees, double internallyDisplacedPersons, double returnedIDPs, double statelessPersons, double othersOfConcern, double totalPopulation) {
+    public RefugeeByYearCountry(int id, int year, String countryOfResidence, String origin, double refugees,
+                                double asylumSeekers, double returnedRefugees, double internallyDisplacedPersons,
+                                double returnedIDPs, double statelessPersons, double othersOfConcern,
+                                double totalPopulation) {
         this.id = id;
         this.year = year;
         this.countryOfResidence = countryOfResidence;
